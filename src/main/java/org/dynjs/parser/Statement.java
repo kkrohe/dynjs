@@ -39,7 +39,7 @@ public interface Statement {
     List<FunctionDeclaration> getFunctionDeclarations();
     List<VariableDeclaration> getVariableDeclarations();
 
-    Object accept(Object context, CodeVisitor visitor, boolean strict);
+    <T> Object accept(T context, CodeVisitor<T> visitor, boolean strict);
     
     int getSizeMetric();
 

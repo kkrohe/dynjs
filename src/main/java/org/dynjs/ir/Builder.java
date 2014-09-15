@@ -120,7 +120,7 @@ import org.dynjs.runtime.JSProgram;
 
 import java.util.List;
 
-public class Builder implements CodeVisitor {
+public class Builder implements CodeVisitor<Scope> {
     private static Builder BUILDER = new Builder();
 
     public static JSProgram compile(CompilationContext compilationContext, ProgramTree program) {
@@ -133,8 +133,8 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, AdditiveExpression expr, boolean strict) {
-        Scope scope = (Scope) context;
+    public Object visit(Scope context, AdditiveExpression expr, boolean strict) {
+        Scope scope = context;
         Operand lhs = (Operand) expr.getLhs().accept(context, this, strict);
         Operand rhs = (Operand) expr.getRhs().accept(context, this, strict);
         boolean subtract = expr.getOp().equals("-");
@@ -181,18 +181,18 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, BitwiseExpression bitwiseExpression, boolean strict) {
+    public Object visit(Scope context, BitwiseExpression bitwiseExpression, boolean strict) {
         return unimplemented(context, bitwiseExpression, strict);
     }
 
     @Override
-    public Object visit(Object context, ArrayLiteralExpression expr, boolean strict) {
+    public Object visit(Scope context, ArrayLiteralExpression expr, boolean strict) {
         return unimplemented(context, expr, strict);
     }
 
     @Override
-    public Object visit(Object context, AssignmentExpression expr, boolean strict) {
-        Scope scope = (Scope) context;
+    public Object visit(Scope context, AssignmentExpression expr, boolean strict) {
+        Scope scope = context;
         Variable lhs = (Variable) expr.getLhs().accept(context, this, strict);
         Operand rhs = (Operand) expr.getRhs().accept(context, this, strict);
 
@@ -202,13 +202,13 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, BitwiseInversionOperatorExpression expr, boolean strict) {
+    public Object visit(Scope context, BitwiseInversionOperatorExpression expr, boolean strict) {
         return unimplemented(context, expr, strict);
     }
 
     @Override
-    public Object visit(Object context, BlockStatement block, boolean strict) {
-        Scope scope = (Scope) context;
+    public Object visit(Scope context, BlockStatement block, boolean strict) {
+        Scope scope = context;
 
         buildDeclaredFunctions(scope, block.getFunctionDeclarations());
 
@@ -222,33 +222,33 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, BooleanLiteralExpression expr, boolean strict) {
+    public Object visit(Scope context, BooleanLiteralExpression expr, boolean strict) {
         return expr.getValue() ? BooleanLiteral.TRUE : BooleanLiteral.FALSE;
     }
 
     @Override
-    public Object visit(Object context, BreakStatement statement, boolean strict) {
+    public Object visit(Scope context, BreakStatement statement, boolean strict) {
         return unimplemented(context, statement, strict);
     }
 
     @Override
-    public Object visit(Object context, CaseClause clause, boolean strict) {
+    public Object visit(Scope context, CaseClause clause, boolean strict) {
         return unimplemented(context, clause, strict);
     }
 
     @Override
-    public Object visit(Object context, DefaultCaseClause clause, boolean strict) {
+    public Object visit(Scope context, DefaultCaseClause clause, boolean strict) {
         return unimplemented(context, clause, strict);
     }
 
     @Override
-    public Object visit(Object context, CatchClause clause, boolean strict) {
+    public Object visit(Scope context, CatchClause clause, boolean strict) {
         return unimplemented(context, clause, strict);
     }
 
     @Override
-    public Object visit(Object context, CompoundAssignmentExpression expr, boolean strict) {
-        Scope scope = (Scope) context;
+    public Object visit(Scope context, CompoundAssignmentExpression expr, boolean strict) {
+        Scope scope = context;
 
         // FIXME: If name of lhs is 'eval' or 'assignments' then generate a raise error instance of doing copy.
         // This is a little out of order with basicinterp where we check this before eval'ing value below.
@@ -263,18 +263,18 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, ContinueStatement statement, boolean strict) {
+    public Object visit(Scope context, ContinueStatement statement, boolean strict) {
         return unimplemented(context, statement, strict);
     }
 
     @Override
-    public Object visit(Object context, DeleteOpExpression expr, boolean strict) {
+    public Object visit(Scope context, DeleteOpExpression expr, boolean strict) {
         return unimplemented(context, expr, strict);
     }
 
     @Override
-    public Object visit(Object context, DoWhileStatement statement, boolean strict) {
-        Scope scope = (Scope) context;
+    public Object visit(Scope context, DoWhileStatement statement, boolean strict) {
+        Scope scope = context;
         final Label startLabel = scope.getNewLabel();
         final Label doneLabel = scope.getNewLabel();
 
@@ -295,59 +295,59 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, EmptyStatement statement, boolean strict) {
+    public Object visit(Scope context, EmptyStatement statement, boolean strict) {
         return Undefined.UNDEFINED;
     }
 
     @Override
-    public Object visit(Object context, EqualityOperatorExpression expr, boolean strict) {
+    public Object visit(Scope context, EqualityOperatorExpression expr, boolean strict) {
         return unimplemented(context, expr, strict);
     }
 
     @Override
-    public Object visit(Object context, CommaOperator expr, boolean strict) {
+    public Object visit(Scope context, CommaOperator expr, boolean strict) {
         return unimplemented(context, expr, strict);
     }
 
     @Override
-    public Object visit(Object context, ExpressionStatement statement, boolean strict) {
+    public Object visit(Scope context, ExpressionStatement statement, boolean strict) {
         return acceptOrUndefined(context, statement.getExpr(), strict);
     }
 
     @Override
-    public Object visit(Object context, FloatingNumberExpression expr, boolean strict) {
+    public Object visit(Scope context, FloatingNumberExpression expr, boolean strict) {
         return new FloatNumber(expr.getValue());
     }
 
     @Override
-    public Object visit(Object context, ForExprInStatement statement, boolean strict) {
+    public Object visit(Scope context, ForExprInStatement statement, boolean strict) {
         return unimplemented(context, statement, strict);
     }
 
     @Override
-    public Object visit(Object context, ForExprOfStatement statement, boolean strict) {
+    public Object visit(Scope context, ForExprOfStatement statement, boolean strict) {
         return unimplemented(context, statement, strict);
     }
 
     @Override
-    public Object visit(Object context, ForExprStatement statement, boolean strict) {
+    public Object visit(Scope context, ForExprStatement statement, boolean strict) {
         return unimplemented(context, statement, strict);
     }
 
     @Override
-    public Object visit(Object context, ForVarDeclInStatement statement, boolean strict) {
+    public Object visit(Scope context, ForVarDeclInStatement statement, boolean strict) {
         return unimplemented(context, statement, strict);
     }
 
     @Override
-    public Object visit(Object context, ForVarDeclOfStatement statement, boolean strict) {
+    public Object visit(Scope context, ForVarDeclOfStatement statement, boolean strict) {
         return unimplemented(context, statement, strict);
     }
 
     // FIXME: flow control may or may not be an issue but old runtime handles it explicitly after accept.
     @Override
-    public Object visit(Object context, ForVarDeclStatement statement, boolean strict) {
-        Scope scope = (Scope) context;
+    public Object visit(Scope context, ForVarDeclStatement statement, boolean strict) {
+        Scope scope = context;
         List<VariableDeclaration> decls = statement.getDeclarationList();
         for (VariableDeclaration each : decls) {
             each.accept(context, this, strict);
@@ -376,8 +376,8 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, FunctionCallExpression expr, boolean strict) {
-        Scope scope = (Scope) context;
+    public Object visit(Scope context, FunctionCallExpression expr, boolean strict) {
+        Scope scope = context;
         Variable result = scope.createTemporaryVariable();
         List<Expression> argumentExpressions = expr.getArgumentExpressions();
         int argsLength = argumentExpressions.size();
@@ -405,7 +405,7 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, FunctionDeclaration statement, boolean strict) {
+    public Object visit(Scope context, FunctionDeclaration statement, boolean strict) {
         // We need to be able to define function decl before any code in the block
         // they live in is executed so when we see them inline while building instructions
         // we just ignore them.
@@ -413,8 +413,8 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, FunctionExpression expr, boolean strict) {
-        Scope scope = (Scope) context;
+    public Object visit(Scope context, FunctionExpression expr, boolean strict) {
+        Scope scope = context;
         FunctionDescriptor descriptor = expr.getDescriptor();
         Variable result = scope.createTemporaryVariable();
         String[] parameterNames = descriptor.getFormalParameterNames();
@@ -466,8 +466,8 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, IdentifierReferenceExpression expr, boolean strict) {
-        Scope scope = (Scope) context;
+    public Object visit(Scope context, IdentifierReferenceExpression expr, boolean strict) {
+        Scope scope = context;
 
         Variable variable = scope.findVariable(expr.getIdentifier());
 
@@ -480,8 +480,8 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, IfStatement ifNode, boolean strict) {
-        Scope scope = (Scope) context;
+    public Object visit(Scope context, IfStatement ifNode, boolean strict) {
+        Scope scope = context;
         Label elseLabel = scope.getNewLabel();
         Label doneLabel  = scope.getNewLabel();
 
@@ -506,18 +506,18 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, InOperatorExpression expr, boolean strict) {
+    public Object visit(Scope context, InOperatorExpression expr, boolean strict) {
         return unimplemented(context, expr, strict);
     }
 
     @Override
-    public Object visit(Object context, OfOperatorExpression expr, boolean strict) {
+    public Object visit(Scope context, OfOperatorExpression expr, boolean strict) {
         return unimplemented(context, expr, strict);
     }
 
     @Override
-    public Object visit(Object context, InstanceofExpression expr, boolean strict) {
-        Scope scope = (Scope) context;
+    public Object visit(Scope context, InstanceofExpression expr, boolean strict) {
+        Scope scope = context;
         Variable result = scope.createTemporaryVariable();
         Operand lhs = (Variable) expr.getLhs().accept(context, this, strict);
         Operand rhs = (Operand) expr.getRhs().accept(context, this, strict);
@@ -528,23 +528,23 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, IntegerNumberExpression expr, boolean strict) {
+    public Object visit(Scope context, IntegerNumberExpression expr, boolean strict) {
         return new IntegerNumber(expr.getValue());
     }
 
     @Override
-    public Object visit(Object context, LogicalExpression expr, boolean strict) {
+    public Object visit(Scope context, LogicalExpression expr, boolean strict) {
         return unimplemented(context, expr, strict);
     }
 
     @Override
-    public Object visit(Object context, LogicalNotOperatorExpression expr, boolean strict) {
+    public Object visit(Scope context, LogicalNotOperatorExpression expr, boolean strict) {
         return unimplemented(context, expr, strict);
     }
 
     @Override
-    public Object visit(Object context, DotExpression expr, boolean strict) {
-        Scope scope = (Scope) context;
+    public Object visit(Scope context, DotExpression expr, boolean strict) {
+        Scope scope = context;
         Variable result = scope.createTemporaryVariable();
         Operand base = (Operand) expr.getLhs().accept(context, this, strict);
 
@@ -554,13 +554,13 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, BracketExpression expr, boolean strict) {
+    public Object visit(Scope context, BracketExpression expr, boolean strict) {
         return unimplemented(context, expr, strict);
     }
 
     @Override
-    public Object visit(Object context, MultiplicativeExpression expr, boolean strict) {
-        Scope scope = (Scope) context;
+    public Object visit(Scope context, MultiplicativeExpression expr, boolean strict) {
+        Scope scope = context;
         Operand lhs = (Operand) expr.getLhs().accept(context, this, strict);
         Operand rhs = (Operand) expr.getRhs().accept(context, this, strict);
         Operand value;
@@ -590,8 +590,8 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, NewOperatorExpression expr, boolean strict) {
-        Scope scope = (Scope) context;
+    public Object visit(Scope context, NewOperatorExpression expr, boolean strict) {
+        Scope scope = context;
 
         // We can statically replace an attempt at calls to illegal member types with an exception
         // raise.  This should eliminate needing to actually check this within the runtime.
@@ -616,18 +616,18 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, NullLiteralExpression expr, boolean strict) {
+    public Object visit(Scope context, NullLiteralExpression expr, boolean strict) {
         return Null.NULL;
     }
 
     @Override
-    public Object visit(Object context, ObjectLiteralExpression expr, boolean strict) {
+    public Object visit(Scope context, ObjectLiteralExpression expr, boolean strict) {
         return unimplemented(context, expr, strict);
     }
 
     @Override
-    public Object visit(Object context, PostOpExpression expr, boolean strict) {
-        Scope scope = (Scope) context;
+    public Object visit(Scope context, PostOpExpression expr, boolean strict) {
+        Scope scope = context;
         Variable tmp = scope.createTemporaryVariable();
         Variable variable = (Variable) expr.getExpr().accept(context, this, strict);
         boolean subtract = expr.getOp().equals("-");
@@ -643,33 +643,33 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, PreOpExpression expr, boolean strict) {
+    public Object visit(Scope context, PreOpExpression expr, boolean strict) {
         return unimplemented(context, expr, strict);
     }
 
     @Override
-    public Object visit(Object context, PropertyGet propertyGet, boolean strict) {
+    public Object visit(Scope context, PropertyGet propertyGet, boolean strict) {
         return unimplemented(context, propertyGet, strict);
     }
 
     @Override
-    public Object visit(Object context, PropertySet propertySet, boolean strict) {
+    public Object visit(Scope context, PropertySet propertySet, boolean strict) {
         return unimplemented(context, propertySet, strict);
     }
 
     @Override
-    public Object visit(Object context, NamedValue namedValue, boolean strict) {
+    public Object visit(Scope context, NamedValue namedValue, boolean strict) {
         return unimplemented(context, namedValue, strict);
     }
 
     @Override
-    public Object visit(Object context, RegexpLiteralExpression expr, boolean strict) {
+    public Object visit(Scope context, RegexpLiteralExpression expr, boolean strict) {
         return unimplemented(context, expr, strict);
     }
 
     @Override
-    public Object visit(Object context, RelationalExpression expr, boolean strict) {
-        Scope scope = (Scope) context;
+    public Object visit(Scope context, RelationalExpression expr, boolean strict) {
+        Scope scope = context;
         Variable result = scope.createTemporaryVariable();
         Operand lhsValue = (Operand) expr.getLhs().accept(context, this, strict);
         Operand rhsValue = (Operand) expr.getRhs().accept(context, this, strict);
@@ -693,8 +693,8 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, ReturnStatement statement, boolean strict) {
-        Scope scope = (Scope) context;
+    public Object visit(Scope context, ReturnStatement statement, boolean strict) {
+        Scope scope = context;
         Operand returnValue = (Operand) acceptOrUndefined(context, statement.getExpr(), strict);
 
         scope.addInstruction(new Return(returnValue));
@@ -703,58 +703,58 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, StrictEqualityOperatorExpression expr, boolean strict) {
+    public Object visit(Scope context, StrictEqualityOperatorExpression expr, boolean strict) {
         return unimplemented(context, expr, strict);
     }
 
     @Override
-    public Object visit(Object context, StringLiteralExpression expr, boolean strict) {
+    public Object visit(Scope context, StringLiteralExpression expr, boolean strict) {
         return new StringLiteral(expr.getLiteral());
     }
 
     @Override
-    public Object visit(Object context, SwitchStatement statement, boolean strict) {
+    public Object visit(Scope context, SwitchStatement statement, boolean strict) {
         return unimplemented(context, statement, strict);
     }
 
     @Override
-    public Object visit(Object context, TernaryExpression expr, boolean strict) {
+    public Object visit(Scope context, TernaryExpression expr, boolean strict) {
         return unimplemented(context, expr, strict);
     }
 
     @Override
-    public Object visit(Object context, ThisExpression expr, boolean strict) {
+    public Object visit(Scope context, ThisExpression expr, boolean strict) {
         return This.THIS;
     }
 
     @Override
-    public Object visit(Object context, ThrowStatement statement, boolean strict) {
+    public Object visit(Scope context, ThrowStatement statement, boolean strict) {
         return unimplemented(context, statement, strict);
     }
 
     @Override
-    public Object visit(Object context, TryStatement statement, boolean strict) {
+    public Object visit(Scope context, TryStatement statement, boolean strict) {
         return unimplemented(context, statement, strict);
     }
 
     @Override
-    public Object visit(Object context, TypeOfOpExpression expr, boolean strict) {
+    public Object visit(Scope context, TypeOfOpExpression expr, boolean strict) {
         return unimplemented(context, expr, strict);
     }
 
     @Override
-    public Object visit(Object context, UnaryMinusExpression expr, boolean strict) {
+    public Object visit(Scope context, UnaryMinusExpression expr, boolean strict) {
         return unimplemented(context, expr, strict);
     }
 
     @Override
-    public Object visit(Object context, UnaryPlusExpression expr, boolean strict) {
+    public Object visit(Scope context, UnaryPlusExpression expr, boolean strict) {
         return unimplemented(context, expr, strict);
     }
 
     @Override
-    public Object visit(Object context, VariableDeclaration expr, boolean strict) {
-        Scope scope = (Scope) context;
+    public Object visit(Scope context, VariableDeclaration expr, boolean strict) {
+        Scope scope = context;
         Variable variable = scope.acquireLocalVariable(expr.getIdentifier());
         Operand value = (Operand) acceptOrUndefined(context, expr.getExpr(), strict);
 
@@ -764,7 +764,7 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, VariableStatement statement, boolean strict) {
+    public Object visit(Scope context, VariableStatement statement, boolean strict) {
         for (VariableDeclaration decl: statement.getVariableDeclarations()) {
             decl.accept(context, this, strict);
         }
@@ -773,15 +773,15 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, VoidOperatorExpression expr, boolean strict) {
+    public Object visit(Scope context, VoidOperatorExpression expr, boolean strict) {
         // 11.4.2 (GetValue must be called even if we never use the value)
         expr.getExpr().accept(context, this, strict);
         return Undefined.UNDEFINED;
     }
 
     @Override
-    public Object visit(Object context, WhileStatement statement, boolean strict) {
-        Scope scope = (Scope) context;
+    public Object visit(Scope context, WhileStatement statement, boolean strict) {
+        Scope scope = context;
         final Label startLabel = scope.getNewLabel();
         final Label doneLabel = scope.getNewLabel();
 
@@ -801,15 +801,15 @@ public class Builder implements CodeVisitor {
     }
 
     @Override
-    public Object visit(Object context, WithStatement statement, boolean strict) {
+    public Object visit(Scope context, WithStatement statement, boolean strict) {
         return unimplemented(context, statement, strict);
     }
 
-    private Object unimplemented(Object context, Object expr, boolean strict) {
+    private Object unimplemented(Scope context, Object expr, boolean strict) {
         throw new RuntimeException("EXPR: '" + expr + "' is unimplemented.");
     }
 
-    private Object acceptOrUndefined(Object context, Expression expr, boolean strict) {
+    private Object acceptOrUndefined(Scope context, Expression expr, boolean strict) {
         return expr != null ? expr.accept(context, this, strict) : Undefined.UNDEFINED;
     }
 

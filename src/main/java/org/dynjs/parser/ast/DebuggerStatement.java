@@ -21,7 +21,7 @@ public class DebuggerStatement extends BaseStatement {
     }
 
     @Override
-    public Object accept(Object context, CodeVisitor visitor, boolean strict) {
+    public <T> Object accept(T context, CodeVisitor<T> visitor, boolean strict) {
         return null;
     }
 

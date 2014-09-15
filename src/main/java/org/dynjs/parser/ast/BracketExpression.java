@@ -41,8 +41,8 @@ public class BracketExpression extends AbstractBinaryExpression {
     }
 
     @Override
-    public Object accept(Object context, CodeVisitor visitor, boolean strict) {
-        return visitor.visit( context, this, strict );
+    public <T> Object accept(T context, CodeVisitor<T> visitor, boolean strict) {
+        return visitor.visit(context, this, strict);
     }
 
     @Override

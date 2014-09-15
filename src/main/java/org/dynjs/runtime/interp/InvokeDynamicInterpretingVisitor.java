@@ -18,8 +18,8 @@ public class InvokeDynamicInterpretingVisitor extends BasicInterpretingVisitor {
     }
 
     @Override
-    public Object visit(Object context1, AssignmentExpression expr, boolean strict) {
-        ExecutionContext context = (ExecutionContext) context1;
+    public Object visit(ExecutionContext context1, AssignmentExpression expr, boolean strict) {
+        ExecutionContext context = context1;
         
         Object lhs = expr.getLhs().accept(context, this, strict);
         if (!(lhs instanceof Reference)) {
@@ -48,8 +48,8 @@ public class InvokeDynamicInterpretingVisitor extends BasicInterpretingVisitor {
     }
 
     @Override
-    public Object visit(Object context1, FunctionCallExpression expr, boolean strict) {
-        ExecutionContext context = (ExecutionContext) context1;
+    public Object visit(ExecutionContext context1, FunctionCallExpression expr, boolean strict) {
+        ExecutionContext context = context1;
 
         Object ref = expr.getMemberExpression().accept(context, this, strict);
         Object function = getValue(context, ref);
@@ -96,8 +96,8 @@ public class InvokeDynamicInterpretingVisitor extends BasicInterpretingVisitor {
     }
 
     @Override
-    public Object visit(Object context1, NewOperatorExpression expr, boolean strict) {
-        ExecutionContext context = (ExecutionContext) context1;
+    public Object visit(ExecutionContext context1, NewOperatorExpression expr, boolean strict) {
+        ExecutionContext context = context1;
         Object ref = expr.getExpr().accept(context, this, strict);
         Object memberExpr = getValue(context, ref);
         Object[] args = new Object[expr.getArgumentExpressions().size()];

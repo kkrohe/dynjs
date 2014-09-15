@@ -84,7 +84,7 @@ public class ArrayLiteralExpression extends BaseExpression {
         return this.exprs;
     }
 
-    public Object accept(Object context, CodeVisitor visitor, boolean strict) {
+    public <T> Object accept(T context, CodeVisitor<T> visitor, boolean strict) {
         return visitor.visit(context, this, strict);
     }
 

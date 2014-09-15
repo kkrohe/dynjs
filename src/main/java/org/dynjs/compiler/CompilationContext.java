@@ -6,15 +6,13 @@ import org.dynjs.runtime.*;
 /**
  * @author Bob McWhirter
  */
-public interface CompilationContext {
+public interface CompilationContext extends ParseContext {
     JSCompiler getCompiler();
     BlockManager getBlockManager();
     DynamicClassLoader getClassLoader();
     Config getConfig();
 
     // used by parser
-
-    JSObject createSyntaxError(String message);
 
     // only used by function compilation
     LexicalEnvironment getLexicalEnvironment();

@@ -59,7 +59,7 @@ public class ForVarDeclInStatement extends AbstractForInStatement {
         return super.getSizeMetric() + decl.getSizeMetric();
     }
 
-    public Object accept(Object context, CodeVisitor visitor, boolean strict) {
+    public <T> Object accept(T context, CodeVisitor<T> visitor, boolean strict) {
         return visitor.visit(context, this, strict);
     }
 

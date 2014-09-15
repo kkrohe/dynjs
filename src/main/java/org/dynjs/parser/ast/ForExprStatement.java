@@ -61,10 +61,10 @@ public class ForExprStatement extends AbstractForStatement {
     }
 
     @Override
-    public Object accept(Object context, CodeVisitor visitor, boolean strict) {
+    public <T> Object accept(T context, CodeVisitor<T> visitor, boolean strict) {
         return visitor.visit(context, this, strict);
     }
-    
+
     public int getSizeMetric() {
         if ( this.initialize != null ) {
             return this.initialize.getSizeMetric() + super.getSizeMetric();

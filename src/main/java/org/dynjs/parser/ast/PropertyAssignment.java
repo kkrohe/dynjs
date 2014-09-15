@@ -22,7 +22,7 @@ public abstract class PropertyAssignment {
         return this.position;
     }
 
-    public abstract Object accept(Object context, CodeVisitor visitor, boolean strict);
+    public abstract <T> Object accept(T context, CodeVisitor<T> visitor, boolean strict);
 
     public abstract int getSizeMetric();
 
