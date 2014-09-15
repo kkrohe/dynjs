@@ -2,6 +2,7 @@ package org.dynjs.parser.ast;
 
 import org.dynjs.exception.ThrowException;
 import org.dynjs.parser.CodeVisitor;
+import org.dynjs.parser.SyntaxElement;
 import org.dynjs.parser.js.Position;
 import org.dynjs.runtime.ExecutionContext;
 import org.dynjs.runtime.Reference;
@@ -12,7 +13,7 @@ import java.lang.invoke.CallSite;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VariableDeclaration {
+public class VariableDeclaration implements SyntaxElement {
     public static final List<VariableDeclaration> EMPTY_LIST = new ArrayList<>();
 
     private Position position;
@@ -29,6 +30,7 @@ public class VariableDeclaration {
         }
     }
 
+    @Override
     public Position getPosition() {
         return this.position;
     }
@@ -52,6 +54,7 @@ public class VariableDeclaration {
         return buf.toString();
     }
 
+    @Override
     public <T> Object accept(T context, CodeVisitor<T> visitor, boolean strict) {
         return visitor.visit(context, this, strict);
     }

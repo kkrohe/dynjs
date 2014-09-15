@@ -116,8 +116,8 @@ public enum TokenType {
     NL( "\\n", true, true ),
     CRNL( "\\r\\n", true, true ),
 
-    //SINGLE_LINE_COMMENT("single-line comment", true),
-    //MULTI_LINE_COMMENT("multi-line comment", true),
+    SINGLE_LINE_COMMENT("single-line comment", false, true),
+    MULTI_LINE_COMMENT("multi-line comment", false, true),
 
     NULL("null"),
     TRUE("true"),
@@ -159,6 +159,21 @@ public enum TokenType {
 
     public String toString() {
         return this.description;
+    }
+
+    public boolean isCommentContainer() {
+        if(this.isSkippable()) {
+            return false;
+        }
+
+        switch(this) {
+            case RIGHT_BRACE:
+            case RIGHT_BRACKET:
+            case RIGHT_PAREN:
+                return false;
+            default:
+                return true;
+        }
     }
 
 }

@@ -4,10 +4,11 @@ import java.util.Collection;
 
 import org.dynjs.parser.CodeVisitor;
 import org.dynjs.parser.Statement;
+import org.dynjs.parser.SyntaxElement;
 import org.dynjs.parser.js.Position;
 import org.dynjs.runtime.ExecutionContext;
 
-public class CatchClause {
+public class CatchClause implements SyntaxElement {
     private final Position position;
     private final String identifier;
     private final Statement block;
@@ -17,7 +18,8 @@ public class CatchClause {
         this.identifier = identifier;
         this.block = block;
     }
-    
+
+    @Override
     public Position getPosition() {
         return this.position;
     }
@@ -42,6 +44,7 @@ public class CatchClause {
         return this.block.dump( indent + "  " );
     }
 
+    @Override
     public <T> Object accept(T context, CodeVisitor<T> visitor, boolean strict) {
         return visitor.visit(context, this, strict);
     }

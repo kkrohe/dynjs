@@ -7,19 +7,20 @@ import java.io.Reader;
 import java.io.StringReader;
 
 import org.dynjs.compiler.CompilationContext;
+import org.dynjs.compiler.ParseContext;
 import org.dynjs.parser.ast.ProgramTree;
 import org.dynjs.runtime.ExecutionContext;
 
 public class JavascriptParser {
 
-    private CompilationContext context;
+    private ParseContext context;
     private ASTFactory factory;
 
     public JavascriptParser(CompilationContext context) {
         this(context, new ASTFactory());
     }
 
-    public JavascriptParser(CompilationContext context, ASTFactory factory) {
+    public JavascriptParser(ParseContext context, ASTFactory factory) {
         this.context = context;
         this.factory = factory;
     }

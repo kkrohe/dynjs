@@ -11,7 +11,7 @@ public class Parameter {
         this.position = position;
         this.identifier = identifier;
     }
-    
+
     public Position getPosition() {
         return this.position;
     }

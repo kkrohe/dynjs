@@ -17,6 +17,7 @@ package org.dynjs.parser.ast;
 
 import java.util.List;
 
+import org.dynjs.parser.SyntaxElement;
 import org.dynjs.parser.js.Position;
 
 public class FunctionDescriptor {

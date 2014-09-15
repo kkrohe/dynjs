@@ -1,17 +1,45 @@
 package org.dynjs.parser;
 
 import org.dynjs.parser.ast.*;
+import org.dynjs.parser.js.Token;
 
-public class DefaultVisitor<T> implements CodeVisitor<T> {
+import java.util.Collection;
+import java.util.Stack;
+
+public class DefaultCommentVisitor<T> implements CompleteVisitor<T> {
+
+    public static class VisitState<U> {
+        public SyntaxElement node;
+        public U context;
+
+        public VisitState(U context, SyntaxElement node) {
+            this.node = node;
+            this.context = context;
+        }
+    }
+
+    protected Stack<VisitState<T>> astStack = new Stack<VisitState<T>>();
+
+
+    protected void visitSyntaxElement(T context, SyntaxElement elem, boolean strict) {
+        astStack.push(new VisitState(context, elem));
+        Collection<Token> comments = elem.getPosition().getComments();
+        if(comments != null) {
+            for(Token comment : comments) {
+                visitComment(context, comment, strict);
+            }
+        }
+        elem.accept(context, this, strict);
+        astStack.pop();
+    }
 
     protected void walkBinaryExpression(T context, AbstractBinaryExpression expr, boolean strict) {
-        expr.getLhs().accept(context, this, strict);
-        expr.getRhs().accept(context, this, strict);
+        visitSyntaxElement(context, expr.getLhs(), strict);
+        visitSyntaxElement(context, expr.getRhs(), strict);
     }
 
     protected void walkUnaryExpression(T context, AbstractUnaryOperatorExpression expr, boolean strict) {
-        expr.getExpr().accept(context, this, strict);
-
+        visitSyntaxElement(context, expr.getExpr(), strict);
     }
 
     @Override
@@ -29,7 +57,7 @@ public class DefaultVisitor<T> implements CodeVisitor<T> {
     @Override
     public Object visit(T context, ArrayLiteralExpression expr, boolean strict) {
         for (Expression each : expr.getExprs()) {
-            each.accept(context, this, strict);
+            visitSyntaxElement(context, each, strict);
         }
         return null;
     }
@@ -49,7 +77,7 @@ public class DefaultVisitor<T> implements CodeVisitor<T> {
     @Override
     public Object visit(T context, BlockStatement statement, boolean strict) {
         for (Statement each : statement.getBlockContent()) {
-            each.accept(context, this, strict);
+            visitSyntaxElement(context, each, strict);
         }
         return null;
     }
@@ -68,26 +96,26 @@ public class DefaultVisitor<T> implements CodeVisitor<T> {
 
     @Override
     public Object visit(T context, CaseClause clause, boolean strict) {
-        clause.getExpression().accept(context, this, strict);
-        clause.getBlock().accept(context, this, strict);
+        visitSyntaxElement(context, clause.getExpression(), strict);
+        visitSyntaxElement(context, clause.getBlock(), strict);
         return null;
     }
 
     @Override
     public Object visit(T context, DefaultCaseClause clause, boolean strict) {
-        clause.getBlock().accept(context, this, strict);
+        visitSyntaxElement(context, clause.getBlock(), strict);
         return null;
     }
 
     @Override
     public Object visit(T context, CatchClause clause, boolean strict) {
-        clause.getBlock().accept(context, this, strict);
+        visitSyntaxElement(context, clause.getBlock(), strict);
         return null;
     }
 
     @Override
     public Object visit(T context, CompoundAssignmentExpression expr, boolean strict) {
-        expr.getRootExpr().accept(context, this, strict);
+        visitSyntaxElement(context, expr.getRootExpr(), strict);
         return null;
     }
 
@@ -105,8 +133,8 @@ public class DefaultVisitor<T> implements CodeVisitor<T> {
 
     @Override
     public Object visit(T context, DoWhileStatement statement, boolean strict) {
-        statement.getTest().accept(context, this, strict);
-        statement.getBlock().accept(context, this, strict);
+        visitSyntaxElement(context, statement.getTest(), strict);
+        visitSyntaxElement(context, statement.getBlock(), strict);
         return null;
     }
 
@@ -124,14 +152,13 @@ public class DefaultVisitor<T> implements CodeVisitor<T> {
 
     @Override
     public Object visit(T context, CommaOperator expr, boolean strict) {
-        expr.getLhs().accept( context, this, strict );
-        expr.getRhs().accept( context, this, strict );
+        walkBinaryExpression(context, expr, strict);
         return null;
     }
 
     @Override
     public Object visit(T context, ExpressionStatement statement, boolean strict) {
-        statement.getExpr().accept(context, this, strict);
+        visitSyntaxElement(context, statement.getExpr(), strict);
         return null;
     }
 
@@ -143,49 +170,49 @@ public class DefaultVisitor<T> implements CodeVisitor<T> {
 
     @Override
     public Object visit(T context, ForExprInStatement statement, boolean strict) {
-        statement.getExpr().accept(context, this, strict);
-        statement.getRhs().accept(context, this, strict);
-        statement.getBlock().accept(context, this, strict);
+        visitSyntaxElement(context, statement.getExpr(), strict);
+        visitSyntaxElement(context, statement.getRhs(), strict);
+        visitSyntaxElement(context, statement.getBlock(), strict);
         return null;
     }
 
     @Override
     public Object visit(T context, ForExprOfStatement statement, boolean strict) {
-        statement.getExpr().accept(context, this, strict);
-        statement.getRhs().accept(context, this, strict);
-        statement.getBlock().accept(context, this, strict);
+        visitSyntaxElement(context, statement.getExpr(), strict);
+        visitSyntaxElement(context, statement.getRhs(), strict);
+        visitSyntaxElement(context, statement.getBlock(), strict);
         return null;
     }
 
     @Override
     public Object visit(T context, ForExprStatement statement, boolean strict) {
         if (statement.getExpr() != null) {
-            statement.getExpr().accept(context, this, strict);
+            visitSyntaxElement(context, statement.getExpr(), strict);
         }
 
         if (statement.getTest() != null) {
-            statement.getTest().accept(context, this, strict);
+            visitSyntaxElement(context, statement.getTest(), strict);
         }
 
         if (statement.getIncrement() != null) {
-            statement.getIncrement().accept(context, this, strict);
+            visitSyntaxElement(context, statement.getIncrement(), strict);
         }
 
-        statement.getBlock().accept(context, this, strict);
+        visitSyntaxElement(context, statement.getBlock(), strict);
         return null;
     }
 
     @Override
     public Object visit(T context, ForVarDeclInStatement statement, boolean strict) {
-        statement.getDeclaration().accept(context, this, strict);
-        statement.getRhs().accept(context, this, strict);
+        visitSyntaxElement(context, statement.getDeclaration(), strict);
+        visitSyntaxElement(context, statement.getRhs(), strict);
         return null;
     }
 
     @Override
     public Object visit(T context, ForVarDeclOfStatement statement, boolean strict) {
-        statement.getDeclaration().accept(context, this, strict);
-        statement.getRhs().accept(context, this, strict);
+        visitSyntaxElement(context, statement.getDeclaration(), strict);
+        visitSyntaxElement(context, statement.getRhs(), strict);
         return null;
     }
 
@@ -193,41 +220,41 @@ public class DefaultVisitor<T> implements CodeVisitor<T> {
     public Object visit(T context, ForVarDeclStatement statement, boolean strict) {
         if (statement.getDeclarationList() != null) {
             for ( VariableDeclaration each : statement.getDeclarationList() ) {
-                each.accept(context, this, strict);
+                visitSyntaxElement(context, each, strict);
             }
         }
 
         if (statement.getTest() != null) {
-            statement.getTest().accept(context, this, strict);
+            visitSyntaxElement(context, statement.getTest(), strict);
         }
 
         if (statement.getIncrement() != null) {
-            statement.getIncrement().accept(context, this, strict);
+            visitSyntaxElement(context, statement.getIncrement(), strict);
         }
 
-        statement.getBlock().accept(context, this, strict);
+        visitSyntaxElement(context, statement.getBlock(), strict);
         return null;
     }
 
     @Override
     public Object visit(T context, FunctionCallExpression expr, boolean strict) {
-        expr.getMemberExpression().accept(context, this, strict);
+        visitSyntaxElement(context, expr.getMemberExpression(), strict);
 
         for (Expression each : expr.getArgumentExpressions()) {
-            each.accept(context, this, strict);
+            visitSyntaxElement(context, each, strict);
         }
         return null;
     }
 
     @Override
     public Object visit(T context, FunctionDeclaration statement, boolean strict) {
-        statement.getBlock().accept(context, this, strict);
+        visitSyntaxElement(context, statement.getBlock(), strict);
         return null;
     }
 
     @Override
     public Object visit(T context, FunctionExpression expr, boolean strict) {
-        expr.getDescriptor().getBlock().accept(context, this, strict);
+        visitSyntaxElement(context, expr.getDescriptor().getBlock(), strict);
         return null;
     }
 
@@ -239,10 +266,10 @@ public class DefaultVisitor<T> implements CodeVisitor<T> {
 
     @Override
     public Object visit(T context, IfStatement statement, boolean strict) {
-        statement.getTest().accept(context, this, strict);
-        statement.getThenBlock().accept(context, this, strict);
+        visitSyntaxElement(context, statement.getTest(), strict);
+        visitSyntaxElement(context, statement.getThenBlock(), strict);
         if (statement.getElseBlock() != null) {
-            statement.getElseBlock().accept(context, this, strict);
+            visitSyntaxElement(context, statement.getElseBlock(), strict);
         }
         return null;
     }
@@ -288,11 +315,10 @@ public class DefaultVisitor<T> implements CodeVisitor<T> {
         expr.getLhs().accept( context, this, strict );
         return null;
     }
-    
+
     @Override
     public Object visit(T context, BracketExpression expr, boolean strict) {
-        expr.getLhs().accept( context, this, strict );
-        expr.getRhs().accept( context, this, strict );
+        walkBinaryExpression(context, expr, strict);
         return null;
     }
 
@@ -317,7 +343,7 @@ public class DefaultVisitor<T> implements CodeVisitor<T> {
     @Override
     public Object visit(T context, ObjectLiteralExpression expr, boolean strict) {
         for (PropertyAssignment each : expr.getPropertyAssignments()) {
-            each.accept(context, this, strict);
+            visitSyntaxElement(context, each, strict);
         }
         return null;
     }
@@ -336,19 +362,19 @@ public class DefaultVisitor<T> implements CodeVisitor<T> {
 
     @Override
     public Object visit(T context, NamedValue namedValue, boolean strict) {
-        namedValue.getExpr().accept(context, this, strict);
+        visitSyntaxElement(context, namedValue.getExpr(), strict);
         return null;
     }
 
     @Override
     public Object visit(T context, PropertyGet propertyGet, boolean strict) {
-        propertyGet.getBlock().accept(context, this, strict);
+        visitSyntaxElement(context, propertyGet.getBlock(), strict);
         return null;
     }
 
     @Override
     public Object visit(T context, PropertySet propertySet, boolean strict) {
-        propertySet.getBlock().accept(context, this, strict);
+        visitSyntaxElement(context, propertySet.getBlock(), strict);
         return null;
     }
 
@@ -367,7 +393,7 @@ public class DefaultVisitor<T> implements CodeVisitor<T> {
     @Override
     public Object visit(T context, ReturnStatement statement, boolean strict) {
         if (statement.getExpr() != null) {
-            statement.getExpr().accept(context, this, strict);
+            visitSyntaxElement(context, statement.getExpr(), strict);
         }
         return null;
     }
@@ -386,18 +412,18 @@ public class DefaultVisitor<T> implements CodeVisitor<T> {
 
     @Override
     public Object visit(T context, SwitchStatement statement, boolean strict) {
-        statement.getExpr().accept(context, this, strict);
+        visitSyntaxElement(context, statement.getExpr(), strict);
         for (CaseClause each : statement.getCaseClauses()) {
-            each.accept(context, this, strict);
+            visitSyntaxElement(context, each, strict);
         }
         return null;
     }
 
     @Override
     public Object visit(T context, TernaryExpression expr, boolean strict) {
-        expr.getTest().accept(context, this, strict);
-        expr.getThenExpr().accept(context, this, strict);
-        expr.getElseExpr().accept(context, this, strict);
+        visitSyntaxElement(context, expr.getTest(), strict);
+        visitSyntaxElement(context, expr.getThenExpr(), strict);
+        visitSyntaxElement(context, expr.getElseExpr(), strict);
         return null;
     }
 
@@ -409,18 +435,18 @@ public class DefaultVisitor<T> implements CodeVisitor<T> {
 
     @Override
     public Object visit(T context, ThrowStatement statement, boolean strict) {
-        statement.getExpr().accept(context, this, strict);
+        visitSyntaxElement(context, statement.getExpr(), strict);
         return null;
     }
 
     @Override
     public Object visit(T context, TryStatement statement, boolean strict) {
-        statement.getTryBlock().accept(context, this, strict);
+        visitSyntaxElement(context, statement.getTryBlock(), strict);
         if (statement.getCatchClause() != null) {
-            statement.getCatchClause().accept(context, this, strict);
+            visitSyntaxElement(context, statement.getCatchClause(), strict);
         }
         if (statement.getFinallyBlock() != null) {
-            statement.getFinallyBlock().accept(context, this, strict);
+            visitSyntaxElement(context, statement.getFinallyBlock(), strict);
         }
         return null;
     }
@@ -446,7 +472,7 @@ public class DefaultVisitor<T> implements CodeVisitor<T> {
     @Override
     public Object visit(T context, VariableDeclaration expr, boolean strict) {
         if (expr.getExpr() != null) {
-            expr.getExpr().accept(context, this, strict);
+            visitSyntaxElement(context, expr.getExpr(), strict);
         }
         return null;
     }
@@ -454,7 +480,7 @@ public class DefaultVisitor<T> implements CodeVisitor<T> {
     @Override
     public Object visit(T context, VariableStatement statement, boolean strict) {
         for (VariableDeclaration each : statement.getVariableDeclarations()) {
-            each.accept(context, this, strict);
+            visitSyntaxElement(context, each, strict);
         }
         return null;
     }
@@ -467,16 +493,20 @@ public class DefaultVisitor<T> implements CodeVisitor<T> {
 
     @Override
     public Object visit(T context, WhileStatement statement, boolean strict) {
-        statement.getTest().accept(context, this, strict);
-        statement.getBlock().accept(context, this, strict);
+        visitSyntaxElement(context, statement.getTest(), strict);
+        visitSyntaxElement(context, statement.getBlock(), strict);
         return null;
     }
 
     @Override
     public Object visit(T context, WithStatement statement, boolean strict) {
-        statement.getExpr().accept(context, this, strict);
-        statement.getBlock().accept(context, this, strict);
+        visitSyntaxElement(context, statement.getExpr(), strict);
+        visitSyntaxElement(context, statement.getBlock(), strict);
         return null;
     }
 
+    @Override
+    public Object visitComment(T context, Token comment, boolean strict) {
+        return null;
+    }
 }

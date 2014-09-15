@@ -5,11 +5,12 @@ import java.util.List;
 
 import org.dynjs.parser.CodeVisitor;
 import org.dynjs.parser.Statement;
+import org.dynjs.parser.SyntaxElement;
 import org.dynjs.parser.js.Position;
 import org.dynjs.runtime.ExecutionContext;
 import me.qmx.jitescript.internal.org.objectweb.asm.tree.LabelNode;
 
-public class CaseClause {
+public class CaseClause implements SyntaxElement {
 
     private Position position;
     private Expression expr;
@@ -25,6 +26,7 @@ public class CaseClause {
         this.fallThroughLabel = new LabelNode();
     }
 
+    @Override
     public Position getPosition() {
         return this.position;
     }
@@ -57,6 +59,7 @@ public class CaseClause {
         return this.block.getVariableDeclarations();
     }
 
+    @Override
     public <T> Object accept(T context, CodeVisitor<T> visitor, boolean strict) {
         return visitor.visit(context, this, strict);
     }

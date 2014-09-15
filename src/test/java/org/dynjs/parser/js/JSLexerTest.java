@@ -138,6 +138,4 @@ public class JSLexerTest {
     public void testSingleLineCommentWithOnlyEOL() throws Exception {
         assertThat( lex( "//\n" ).getType() ).isEqualTo( NL );
     }
-    
-
 }

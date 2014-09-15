@@ -3,7 +3,9 @@ package org.dynjs.parser.js;
 import static org.dynjs.parser.js.TokenType.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Lexer {
@@ -49,6 +51,8 @@ public class Lexer {
     private String fileName = "<eval>";
     private int lineNumber;
     private int columnNumber;
+
+    private List<Token> comments = new ArrayList<Token>();
 
     private TokenType lastTokenType;
     private int parens;
@@ -96,6 +100,20 @@ public class Lexer {
         }
     }
 
+    protected Token flushComments(Token current) {
+        if(this.comments.size() == 0) {
+            return current;
+        }
+
+        if(!current.getType().isCommentContainer()) {
+            return current;
+        }
+
+        current.addComments(this.comments);
+        this.comments = new ArrayList<Token>();
+        return current;
+    }
+
     protected Token newToken(TokenType type, String text) {
         if (!type.isSkippable()) {
             this.lastTokenType = type;
@@ -114,7 +132,7 @@ public class Lexer {
             --this.parens;
         }
 
-        return token;
+        return flushComments(token);
     }
 
     protected void incrementLine() {
@@ -634,7 +652,8 @@ public class Lexer {
     }
 
     protected void singleLineComment() {
-        consume();
+        StringBuilder text = new StringBuilder();
+        text.append((char) consume());
         int c = 0;
         while (true) {
             //c = consume();
@@ -645,27 +664,31 @@ public class Lexer {
             } else if (c < 0 || c == '\r' || c == '\n' || c == '\u2028' || c == '\u2029') {
                 break;
             }
-            consume();
+            text.append((char) consume());
         }
+        comments.add(newToken(TokenType.SINGLE_LINE_COMMENT, text.toString()));
         //incrementLine();
     }
 
     protected void multiLineComment() {
-        consume();
+        StringBuilder text = new StringBuilder();
+        text.append((char) consume());
 
         while (true) {
             int c = consume();
+            text.append((char)c);
             if (c < 0) {
                 throw new LexerException("unexpected end-of-file");
             } else if (c == '\n') {
                 incrementLine();
             } else if (c == '\r') {
                 if (la() == '\n') {
-                    consume();
+                    text.append((char) consume());
                 }
                 incrementLine();
             } else if (c == '*' && la() == '/') {
-                consume();
+                text.append((char) consume());
+                comments.add(newToken(TokenType.MULTI_LINE_COMMENT, text.toString()));
                 return;
             }
         }

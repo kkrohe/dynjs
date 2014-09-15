@@ -23,9 +23,7 @@ import org.dynjs.parser.js.Position;
 import org.dynjs.runtime.Completion;
 import org.dynjs.runtime.ExecutionContext;
 
-public interface Statement {
-
-    Position getPosition();
+public interface Statement extends SyntaxElement {
 
     int getStatementNumber();
     
@@ -39,8 +37,6 @@ public interface Statement {
     List<FunctionDeclaration> getFunctionDeclarations();
     List<VariableDeclaration> getVariableDeclarations();
 
-    <T> Object accept(T context, CodeVisitor<T> visitor, boolean strict);
-    
     int getSizeMetric();
 
     Completion interpret(ExecutionContext context);

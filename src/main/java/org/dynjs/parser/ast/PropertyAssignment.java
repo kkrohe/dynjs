@@ -1,10 +1,11 @@
 package org.dynjs.parser.ast;
 
 import org.dynjs.parser.CodeVisitor;
+import org.dynjs.parser.SyntaxElement;
 import org.dynjs.parser.js.Position;
 import org.dynjs.runtime.ExecutionContext;
 
-public abstract class PropertyAssignment {
+public abstract class PropertyAssignment implements SyntaxElement {
 
     private Position position;
     private String name;

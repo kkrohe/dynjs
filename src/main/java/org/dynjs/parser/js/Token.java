@@ -1,5 +1,10 @@
 package org.dynjs.parser.js;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 public class Token implements Position {
     
     private TokenType type;
@@ -10,6 +15,7 @@ public class Token implements Position {
     private boolean escapedString;
     private boolean escapedOctalString;
     private boolean continuedLine;
+    private List<Token> comments;
 
     public Token(TokenType type, String text, String fileName, int lineNumber, int columnNumber) {
         this.type = type;
@@ -57,7 +63,28 @@ public class Token implements Position {
     public boolean isSkippable() {
         return this.type.isSkippable();
     }
-    
+
+    @Override
+    public Collection<Token> getComments() {
+        return comments;
+    }
+
+    @Override
+    public void addComments(Collection<Token> comments) {
+        if(this.comments == null) {
+            this.comments = new ArrayList<Token>();
+        }
+        this.comments.addAll(comments);
+    }
+
+    @Override
+    public void addComments(Token... comments) {
+        if(this.comments == null) {
+            this.comments = new ArrayList<Token>();
+        }
+        Collections.addAll(this.comments, comments);
+    }
+
     public String getFileName() {
         return this.fileName;
     }
