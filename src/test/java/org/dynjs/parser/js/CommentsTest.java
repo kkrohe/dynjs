@@ -2,6 +2,7 @@ package org.dynjs.parser.js;
 
 import org.dynjs.compiler.ParseContext;
 import org.dynjs.parser.DefaultCommentVisitor;
+import org.dynjs.parser.ast.NewOperatorExpression;
 import org.dynjs.parser.ast.ProgramTree;
 import org.dynjs.runtime.JSObject;
 import org.junit.Test;
@@ -9,6 +10,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashSet;
 
 import static org.dynjs.parser.js.TokenType.*;
 import static org.fest.assertions.Assertions.*;
@@ -53,9 +55,19 @@ public class CommentsTest {
         comments[0] = 0;
 
         DefaultCommentVisitor vis = new DefaultCommentVisitor(){
+            private HashSet<Token> visited = new HashSet<Token>();
+
             @Override public Object visitComment(Object context, Token comment, boolean strict) {
-                comments[0]++;
-                System.out.println("found comment : " + comment.getText());
+                if(!visited.contains(comment)) {
+                    visited.add(comment);
+                    comments[0]++;
+                    System.out.println("found comment : " + comment.getText());
+                }
+                return null;
+            }
+
+            @Override public Object visit(Object context, NewOperatorExpression expr, boolean strict) {
+                super.visit(context, expr, strict);
                 return null;
             }
         };

@@ -170,6 +170,9 @@ public enum TokenType {
             case RIGHT_BRACE:
             case RIGHT_BRACKET:
             case RIGHT_PAREN:
+            case LEFT_BRACE:
+            case LEFT_BRACKET:
+            case LEFT_PAREN:
                 return false;
             default:
                 return true;
